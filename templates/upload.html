@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Algorithm - AlgoPractice{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-primary">
+                <i class="fas fa-upload me-2"></i>Upload Algorithm
+            </h1>
+            <p class="text-muted">Share your algorithms with the community</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code me-2"></i>Algorithm Details
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="uploadForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Algorithm Name
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">
+                                    <i class="fas fa-folder me-1"></i>Category
+                                </label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Choose category...</option>
+                                    <option value="DSA">Data Structures & Algorithms</option>
+                                    <option value="MLA">Machine Learning Algorithms</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="codeEditor" class="form-label">
+                                <i class="fas fa-code me-1"></i>Algorithm Code
+                            </label>
+                            <div id="codeEditor"
+                                style="height: 400px; border: 1px solid #dee2e6; border-radius: 0.375rem;"></div>
+                            <input type="hidden" id="code" name="code">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload me-2"></i>Upload Algorithm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Upload Guidelines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Use descriptive algorithm names
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Include proper documentation
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Add example usage
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Choose appropriate category
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-lg border-0 mt-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">
+                        Make sure your code is well-commented and follows Python best practices.
+                        Include time and space complexity information when possible.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+<script>
+    let editor;
+
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+        editor = monaco.editor.create(document.getElementById('codeEditor'), {
+            value: `# Your Algorithm Code Here
+# Example: Bubble Sort
+
+def bubble_sort(arr):
+    """
+    Bubble Sort Algorithm
+    Time Complexity: O(n²)
+    Space Complexity: O(1)
+    """
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+# Example usage
+if __name__ == "__main__":
+    # Test the algorithm
+    test_array = [64, 34, 25, 12, 22, 11, 90]
+    print("Original array:", test_array)
+    sorted_array = bubble_sort(test_array.copy())
+    print("Sorted array:", sorted_array)
+`,
+            language: 'python',
+            theme: 'vs-dark',
+            automaticLayout: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: 'on',
+            roundedSelection: false,
+            scrollBeyondLastLine: false,
+            readOnly: false,
+            cursorStyle: 'line'
+        });
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Get code from editor
+        const code = editor.getValue();
+        document.getElementById('code').value = code;
+
+        // Submit form
+        const formData = new FormData(this);
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.text();
+                }
+            })
+            .then(data => {
+                if (data) {
+                    // Handle any error messages
+                    alert('Upload completed!');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading algorithm');
+            });
+    });
+</script>
+{% endblock %}

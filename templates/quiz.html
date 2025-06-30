@@ -1,0 +1,634 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - AlgoPractice{% endblock %}
+
+{% block extra_css %}
+<style>
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .question-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .question-number {
+        background: var(--primary-color);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .question-type {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .type-multiple-choice {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .type-fill-blank {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .type-true-false {
+        background: #e8f5e8;
+        color: #388e3c;
+    }
+
+    .type-coding {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+
+    .options-container {
+        margin-top: 1.5rem;
+    }
+
+    .option-item {
+        padding: 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .option-item:hover {
+        border-color: var(--primary-color);
+        background: #f8f9fa;
+    }
+
+    .option-item.selected {
+        border-color: var(--primary-color);
+        background: #e3f2fd;
+    }
+
+    .option-item.correct {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+
+    .option-item.incorrect {
+        border-color: #dc3545;
+        background: #f8d7da;
+    }
+
+    .fill-blank-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .fill-blank-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .quiz-progress {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+    }
+
+    .timer {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .score-display {
+        background: linear-gradient(135deg, var(--success-color), var(--warning-color));
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .explanation {
+        background: #f8f9fa;
+        border-left: 4px solid var(--primary-color);
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 0 8px 8px 0;
+    }
+
+    .api-source {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="fw-bold text-primary">
+                <i class="fas fa-question-circle me-2"></i>Dynamic Quiz
+            </h1>
+            <p class="text-muted">Test your knowledge with live questions from open APIs</p>
+        </div>
+    </div>
+
+    <!-- Quiz Selection -->
+    <div class="row mb-4" id="quizSelection">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Select Quiz Category
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-code fa-3x text-primary mb-3"></i>
+                                    <h5>Data Structures & Algorithms</h5>
+                                    <p class="text-muted">Test your DSA knowledge with live questions</p>
+                                    <button class="btn btn-primary" onclick="startQuiz('DSA')">
+                                        <i class="fas fa-play me-1"></i>Start Quiz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-brain fa-3x text-success mb-3"></i>
+                                    <h5>Machine Learning</h5>
+                                    <p class="text-muted">Test your ML knowledge with live questions</p>
+                                    <button class="btn btn-success" onclick="startQuiz('MLA')">
+                                        <i class="fas fa-play me-1"></i>Start Quiz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Interface -->
+    <div class="quiz-container" id="quizInterface" style="display: none;">
+        <!-- Progress Bar -->
+        <div class="quiz-progress">
+            <div class="progress-stats">
+                <span>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></span>
+                <span>Score: <span id="currentScore">0</span></span>
+                <span class="timer" id="timer">Time: 00:00</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" id="quizProgress" role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Display -->
+        <div id="questionContainer">
+            <!-- Questions will be loaded here -->
+        </div>
+
+        <!-- Quiz Controls -->
+        <div class="quiz-controls">
+            <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                <i class="fas fa-arrow-left me-1"></i>Previous
+            </button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                Next<i class="fas fa-arrow-right ms-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Results Display -->
+    <div class="quiz-container" id="resultsDisplay" style="display: none;">
+        <div class="score-display">
+            <h2>Quiz Complete!</h2>
+            <h3>Your Score: <span id="finalScore">0</span>%</h3>
+            <p>You got <span id="correctAnswers">0</span> out of <span id="totalAnswers">0</span> questions correct</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Performance Breakdown
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <h4 class="text-primary" id="multipleChoiceScore">0%</h4>
+                        <p class="text-muted">Multiple Choice</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4 class="text-success" id="fillBlankScore">0%</h4>
+                        <p class="text-muted">Fill in the Blank</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4 class="text-warning" id="trueFalseScore">0%</h4>
+                        <p class="text-muted">True/False</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4 class="text-info" id="codingScore">0%</h4>
+                        <p class="text-muted">Coding</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-primary me-2" onclick="reviewAnswers()">
+                <i class="fas fa-eye me-1"></i>Review Answers
+            </button>
+            <button class="btn btn-success me-2" onclick="retakeQuiz()">
+                <i class="fas fa-redo me-1"></i>Retake Quiz
+            </button>
+            <button class="btn btn-secondary" onclick="backToSelection()">
+                <i class="fas fa-home me-1"></i>Back to Selection
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Quiz data and state
+    let currentQuiz = null;
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let quizStartTime = null;
+    let timerInterval = null;
+
+    // Start quiz
+    function startQuiz(category) {
+        // Show loading
+        document.getElementById('quizSelection').style.display = 'none';
+        document.getElementById('quizInterface').style.display = 'block';
+        document.getElementById('questionContainer').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner"></div>
+                <p class="text-muted">Loading questions from APIs...</p>
+            </div>
+        `;
+
+        // Fetch questions from API
+        fetch(`/api/questions`)
+            .then(response => response.json())
+            .then(data => {
+                currentQuiz = data[category] || [];
+
+                // If no questions from API, use fallback questions
+                if (currentQuiz.length === 0) {
+                    currentQuiz = getFallbackQuestions(category);
+                }
+
+                // Limit to 10 questions
+                currentQuiz = currentQuiz.slice(0, 10);
+
+                if (currentQuiz.length === 0) {
+                    document.getElementById('questionContainer').innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                            <h4>No questions available</h4>
+                            <p class="text-muted">Please try again later or check your internet connection.</p>
+                            <button class="btn btn-primary" onclick="backToSelection()">Back to Selection</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                currentQuestionIndex = 0;
+                userAnswers = new Array(currentQuiz.length).fill(null);
+                quizStartTime = Date.now();
+
+                document.getElementById('totalQuestions').textContent = currentQuiz.length;
+                startTimer();
+                displayQuestion();
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+                // Use fallback questions
+                currentQuiz = getFallbackQuestions(category);
+                currentQuestionIndex = 0;
+                userAnswers = new Array(currentQuiz.length).fill(null);
+                quizStartTime = Date.now();
+
+                document.getElementById('totalQuestions').textContent = currentQuiz.length;
+                startTimer();
+                displayQuestion();
+            });
+    }
+
+    // Fallback questions if API fails
+    function getFallbackQuestions(category) {
+        const fallbackQuestions = {
+            DSA: [
+                {
+                    id: 'fallback_1',
+                    type: 'multiple-choice',
+                    question: 'What is the time complexity of Bubble Sort in the worst case?',
+                    options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(log n)'],
+                    correct: 2,
+                    explanation: 'Bubble Sort has O(n²) time complexity in the worst case.',
+                    source: 'fallback'
+                },
+                {
+                    id: 'fallback_2',
+                    type: 'fill-blank',
+                    question: 'A data structure that follows the LIFO principle is called a _____',
+                    correct: 'stack',
+                    explanation: 'A stack follows Last-In-First-Out (LIFO) principle.',
+                    source: 'fallback'
+                }
+            ],
+            MLA: [
+                {
+                    id: 'fallback_3',
+                    type: 'multiple-choice',
+                    question: 'Which algorithm is used for classification problems?',
+                    options: ['Linear Regression', 'Logistic Regression', 'K-Means Clustering', 'Principal Component Analysis'],
+                    correct: 1,
+                    explanation: 'Logistic Regression is used for classification problems.',
+                    source: 'fallback'
+                },
+                {
+                    id: 'fallback_4',
+                    type: 'fill-blank',
+                    question: 'The process of converting categorical variables into numerical format is called _____',
+                    correct: 'encoding',
+                    explanation: 'Encoding converts categorical variables into numerical format.',
+                    source: 'fallback'
+                }
+            ]
+        };
+
+        return fallbackQuestions[category] || [];
+    }
+
+    // Display current question
+    function displayQuestion() {
+        const question = currentQuiz[currentQuestionIndex];
+        const container = document.getElementById('questionContainer');
+
+        let questionHTML = `
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-number">${currentQuestionIndex + 1}</div>
+                    <span class="question-type type-${question.type.replace('-', '-')}">${question.type.replace('-', ' ').toUpperCase()}</span>
+                </div>
+                <h5 class="mb-3">${question.question}</h5>
+        `;
+
+        switch (question.type) {
+            case 'multiple-choice':
+                questionHTML += '<div class="options-container">';
+                question.options.forEach((option, index) => {
+                    const isSelected = userAnswers[currentQuestionIndex] === index;
+                    questionHTML += `
+                        <div class="option-item ${isSelected ? 'selected' : ''}" onclick="selectOption(${index})">
+                            <strong>${String.fromCharCode(65 + index)}.</strong> ${option}
+                        </div>
+                    `;
+                });
+                questionHTML += '</div>';
+                break;
+
+            case 'fill-blank':
+                questionHTML += `
+                    <input type="text" class="fill-blank-input" 
+                           placeholder="Enter your answer..." 
+                           value="${userAnswers[currentQuestionIndex] || ''}"
+                           onchange="updateFillBlankAnswer(this.value)">
+                `;
+                break;
+
+            case 'true-false':
+                questionHTML += `
+                    <div class="options-container">
+                        <div class="option-item ${userAnswers[currentQuestionIndex] === true ? 'selected' : ''}" onclick="selectTrueFalse(true)">
+                            <strong>True</strong>
+                        </div>
+                        <div class="option-item ${userAnswers[currentQuestionIndex] === false ? 'selected' : ''}" onclick="selectTrueFalse(false)">
+                            <strong>False</strong>
+                        </div>
+                    </div>
+                `;
+                break;
+        }
+
+        // Add source attribution
+        if (question.source && question.source !== 'fallback') {
+            questionHTML += `<div class="api-source mt-2">Source: ${question.source}</div>`;
+        }
+
+        questionHTML += '</div>';
+        container.innerHTML = questionHTML;
+
+        // Update progress
+        document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+        document.getElementById('quizProgress').style.width = `${((currentQuestionIndex + 1) / currentQuiz.length) * 100}%`;
+
+        // Update navigation buttons
+        document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+        document.getElementById('nextBtn').textContent = currentQuestionIndex === currentQuiz.length - 1 ? 'Finish Quiz' : 'Next';
+    }
+
+    // Handle option selection
+    function selectOption(index) {
+        userAnswers[currentQuestionIndex] = index;
+
+        // Update visual selection
+        document.querySelectorAll('.option-item').forEach((item, i) => {
+            item.classList.toggle('selected', i === index);
+        });
+    }
+
+    // Handle fill-in-the-blank
+    function updateFillBlankAnswer(value) {
+        userAnswers[currentQuestionIndex] = value;
+    }
+
+    // Handle true/false selection
+    function selectTrueFalse(value) {
+        userAnswers[currentQuestionIndex] = value;
+
+        document.querySelectorAll('.option-item').forEach((item, index) => {
+            item.classList.toggle('selected',
+                (index === 0 && value === true) || (index === 1 && value === false)
+            );
+        });
+    }
+
+    // Navigation functions
+    function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < currentQuiz.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            finishQuiz();
+        }
+    }
+
+    // Timer functions
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - quizStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timer').textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+    }
+
+    // Finish quiz and show results
+    function finishQuiz() {
+        stopTimer();
+
+        const results = calculateResults();
+
+        document.getElementById('quizInterface').style.display = 'none';
+        document.getElementById('resultsDisplay').style.display = 'block';
+
+        document.getElementById('finalScore').textContent = results.percentage;
+        document.getElementById('correctAnswers').textContent = results.correct;
+        document.getElementById('totalAnswers').textContent = currentQuiz.length;
+
+        // Update breakdown scores
+        document.getElementById('multipleChoiceScore').textContent = results.breakdown.multipleChoice + '%';
+        document.getElementById('fillBlankScore').textContent = results.breakdown.fillBlank + '%';
+        document.getElementById('trueFalseScore').textContent = results.breakdown.trueFalse + '%';
+        document.getElementById('codingScore').textContent = results.breakdown.coding + '%';
+    }
+
+    // Calculate quiz results
+    function calculateResults() {
+        let correct = 0;
+        const breakdown = {
+            multipleChoice: 0,
+            fillBlank: 0,
+            trueFalse: 0,
+            coding: 0
+        };
+
+        const typeCounts = {
+            multipleChoice: 0,
+            fillBlank: 0,
+            trueFalse: 0,
+            coding: 0
+        };
+
+        currentQuiz.forEach((question, index) => {
+            const userAnswer = userAnswers[index];
+            let isCorrect = false;
+
+            switch (question.type) {
+                case 'multiple-choice':
+                    isCorrect = userAnswer === question.correct;
+                    typeCounts.multipleChoice++;
+                    if (isCorrect) breakdown.multipleChoice++;
+                    break;
+                case 'fill-blank':
+                    isCorrect = userAnswer && userAnswer.toLowerCase().trim() === question.correct.toLowerCase().trim();
+                    typeCounts.fillBlank++;
+                    if (isCorrect) breakdown.fillBlank++;
+                    break;
+                case 'true-false':
+                    isCorrect = userAnswer === question.correct;
+                    typeCounts.trueFalse++;
+                    if (isCorrect) breakdown.trueFalse++;
+                    break;
+            }
+
+            if (isCorrect) correct++;
+        });
+
+        // Calculate percentages
+        Object.keys(breakdown).forEach(type => {
+            if (typeCounts[type] > 0) {
+                breakdown[type] = Math.round((breakdown[type] / typeCounts[type]) * 100);
+            }
+        });
+
+        return {
+            correct,
+            percentage: Math.round((correct / currentQuiz.length) * 100),
+            breakdown
+        };
+    }
+
+    // Navigation functions
+    function reviewAnswers() {
+        // Implementation for reviewing answers
+        alert('Review feature coming soon!');
+    }
+
+    function retakeQuiz() {
+        location.reload();
+    }
+
+    function backToSelection() {
+        location.reload();
+    }
+</script>
+{% endblock %}

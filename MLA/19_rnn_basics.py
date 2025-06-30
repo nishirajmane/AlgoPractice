@@ -1,4 +1,4 @@
- """
+"""
 Title: Recurrent Neural Networks (RNN) Basics in Machine Learning
 
 Definition:

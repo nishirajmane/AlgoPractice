@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Practice - AlgoPractice{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-primary">
+                <i class="fas fa-play me-2"></i>Practice Algorithms
+            </h1>
+            <p class="text-muted">Test your knowledge with interactive practice problems</p>
+        </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Your Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-primary" id="completedCount">0</h3>
+                                <p class="text-muted">Completed</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-success" id="correctCount">0</h3>
+                                <p class="text-muted">Correct</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-warning" id="attemptedCount">0</h3>
+                                <p class="text-muted">Attempted</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-info" id="accuracy">0%</h3>
+                                <p class="text-muted">Accuracy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress mt-3">
+                        <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Categories -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-th-large me-2"></i>Practice Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="practice-card">
+                                <h5><i class="fas fa-code me-2"></i>Data Structures</h5>
+                                <p>Practice arrays, linked lists, stacks, queues, trees, and graphs</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-primary">{{ algorithms.DSA|length }} Problems</span>
+                                    <button class="btn btn-primary btn-sm" onclick="startPractice('DSA')">
+                                        <i class="fas fa-play me-1"></i>Start
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="practice-card">
+                                <h5><i class="fas fa-brain me-2"></i>Machine Learning</h5>
+                                <p>Practice classification, regression, clustering, and neural networks</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">{{ algorithms.MLA|length }} Problems</span>
+                                    <button class="btn btn-success btn-sm" onclick="startPractice('MLA')">
+                                        <i class="fas fa-play me-1"></i>Start
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Practice -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Practice
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-random fa-2x text-primary mb-2"></i>
+                                <h6>Random Problem</h6>
+                                <button class="btn btn-outline-primary btn-sm" onclick="getRandomProblem()">
+                                    Get Problem
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <h6>Timed Challenge</h6>
+                                <button class="btn btn-outline-warning btn-sm" onclick="startTimedChallenge()">
+                                    Start Timer
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-trophy fa-2x text-success mb-2"></i>
+                                <h6>Daily Challenge</h6>
+                                <button class="btn btn-outline-success btn-sm" onclick="getDailyChallenge()">
+                                    View Challenge
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Problems List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>All Practice Problems
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" id="difficultyFilter">
+                            <option value="">All Difficulties</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="not-attempted">Not Attempted</option>
+                            <option value="attempted">Attempted</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="problemsList">
+                        <!-- Problems will be loaded here -->
+                        <div class="text-center py-4">
+                            <div class="spinner"></div>
+                            <p class="text-muted">Loading problems...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Practice Modal -->
+<div class="modal fade" id="practiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="practiceModalTitle">Practice Problem</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="problemContent">
+                    <!-- Problem content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submitAnswer">Submit Answer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for JavaScript -->
+<script type="application/json" id="algorithmsData">
+{
+    "DSA": {{ algorithms.DSA|tojson }},
+    "MLA": {{ algorithms.MLA|tojson }}
+}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Practice functionality
+    let currentProblem = null;
+    let practiceStats = {
+        completed: 0,
+        correct: 0,
+        attempted: 0
+    };
+
+    // Load algorithms data from hidden element
+    const algorithmsData = JSON.parse(document.getElementById('algorithmsData').textContent);
+
+    // Load practice statistics from localStorage
+    function loadPracticeStats() {
+        const saved = localStorage.getItem('practiceStats');
+        if (saved) {
+            practiceStats = JSON.parse(saved);
+            updateStatsDisplay();
+        }
+    }
+
+    // Update statistics display
+    function updateStatsDisplay() {
+        document.getElementById('completedCount').textContent = practiceStats.completed;
+        document.getElementById('correctCount').textContent = practiceStats.correct;
+        document.getElementById('attemptedCount').textContent = practiceStats.attempted;
+
+        const accuracy = practiceStats.attempted > 0 ?
+            Math.round((practiceStats.correct / practiceStats.attempted) * 100) : 0;
+        document.getElementById('accuracy').textContent = accuracy + '%';
+
+        const progress = (practiceStats.completed / 48) * 100; // 48 total algorithms
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+    }
+
+    // Start practice for a specific category
+    function startPractice(category) {
+        const algorithms = category === 'DSA' ? algorithmsData.DSA : algorithmsData.MLA;
+        if (algorithms.length > 0) {
+            const randomIndex = Math.floor(Math.random() * algorithms.length);
+            const algorithm = algorithms[randomIndex];
+            showProblem(algorithm, category);
+        }
+    }
+
+    // Show a practice problem
+    function showProblem(algorithm, category) {
+        currentProblem = { algorithm, category };
+
+        // Load algorithm content
+        fetch(`/api/algorithm/${category}/${algorithm.filename}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.content) {
+                    document.getElementById('practiceModalTitle').textContent = algorithm.name;
+                    document.getElementById('problemContent').innerHTML = `
+                    <div class="mb-3">
+                        <h6>Problem:</h6>
+                        <p>Implement the ${algorithm.name} algorithm. Study the code below and answer the questions.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Code:</h6>
+                        <div class="code-block">
+                            <pre><code class="language-python">${data.content}</code></pre>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Questions:</h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q1" id="q1a" value="a">
+                            <label class="form-check-label" for="q1a">
+                                What is the time complexity of this algorithm?
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q1" id="q1b" value="b">
+                            <label class="form-check-label" for="q1b">
+                                What data structure is primarily used?
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q1" id="q1c" value="c">
+                            <label class="form-check-label" for="q1c">
+                                Is this algorithm stable?
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                    // Highlight syntax
+                    if (window.Prism) {
+                        Prism.highlightAll();
+                    }
+
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('practiceModal'));
+                    modal.show();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading algorithm:', error);
+                alert('Error loading algorithm content');
+            });
+    }
+
+    // Submit answer
+    document.getElementById('submitAnswer').addEventListener('click', function () {
+        if (currentProblem) {
+            practiceStats.attempted++;
+            practiceStats.correct++; // For demo purposes, always correct
+            practiceStats.completed++;
+
+            // Save to localStorage
+            localStorage.setItem('practiceStats', JSON.stringify(practiceStats));
+
+            // Update display
+            updateStatsDisplay();
+
+            // Show success message
+            alert('Correct! Well done!');
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('practiceModal'));
+            modal.hide();
+        }
+    });
+
+    // Random problem
+    function getRandomProblem() {
+        const allAlgorithms = [...algorithmsData.DSA, ...algorithmsData.MLA];
+        if (allAlgorithms.length > 0) {
+            const randomIndex = Math.floor(Math.random() * allAlgorithms.length);
+            const algorithm = allAlgorithms[randomIndex];
+            const category = algorithmsData.DSA.includes(algorithm) ? 'DSA' : 'MLA';
+            showProblem(algorithm, category);
+        }
+    }
+
+    // Timed challenge
+    function startTimedChallenge() {
+        alert('Timed challenge feature coming soon!');
+    }
+
+    // Daily challenge
+    function getDailyChallenge() {
+        alert('Daily challenge feature coming soon!');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPracticeStats();
+
+        // Load problems list
+        setTimeout(() => {
+            let problemsHTML = '<div class="row g-3">';
+
+            // Add DSA problems
+            algorithmsData.DSA.forEach(algorithm => {
+                problemsHTML += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="algorithm-card">
+                            <h6>${algorithm.name}</h6>
+                            <p class="text-muted small">Data Structures & Algorithms</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">Easy</span>
+                                <button class="btn btn-sm btn-outline-primary" onclick="startPractice('DSA')">
+                                    Practice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Add MLA problems
+            algorithmsData.MLA.forEach(algorithm => {
+                problemsHTML += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="algorithm-card">
+                            <h6>${algorithm.name}</h6>
+                            <p class="text-muted small">Machine Learning</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success">Medium</span>
+                                <button class="btn btn-sm btn-outline-success" onclick="startPractice('MLA')">
+                                    Practice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            problemsHTML += '</div>';
+            document.getElementById('problemsList').innerHTML = problemsHTML;
+        }, 1000);
+    });
+</script>
+{% endblock %}

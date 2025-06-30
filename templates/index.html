@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}AlgoPractice - Master Algorithms{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    Master Algorithms & Data Structures
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Learn, practice, and master algorithms with our comprehensive collection.
+                    From basic data structures to advanced machine learning algorithms.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('algorithms') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-list me-2"></i>Browse Algorithms
+                    </a>
+                    <a href="{{ url_for('code_editor') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-edit me-2"></i>Code Editor
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <i class="fas fa-code fa-10x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold text-primary">Why Choose AlgoPractice?</h2>
+            <p class="text-muted">Comprehensive learning platform for algorithm mastery</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-code fa-3x text-primary"></i>
+                </div>
+                <h4>Comprehensive Collection</h4>
+                <p class="text-muted">Access a wide range of algorithms from basic data structures to advanced machine
+                    learning implementations.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-edit fa-3x text-success"></i>
+                </div>
+                <h4>Interactive Code Editor</h4>
+                <p class="text-muted">Write, test, and execute code in real-time with our powerful Monaco-based code
+                    editor.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-upload fa-3x text-info"></i>
+                </div>
+                <h4>Share Your Algorithms</h4>
+                <p class="text-muted">Upload and share your own algorithms with the community. Build your portfolio and
+                    help others learn.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section -->
+<div class="container py-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold text-primary">Algorithm Categories</h2>
+            <p class="text-muted">Explore different types of algorithms</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="category-card">
+                <div class="card h-100 border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="category-icon me-3">
+                                <i class="fas fa-code fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1">Data Structures & Algorithms</h4>
+                                <p class="text-muted mb-0">Sorting, searching, and data structure implementations</p>
+                            </div>
+                        </div>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Arrays and Linked Lists</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Sorting Algorithms</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Search Algorithms</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Trees and Graphs</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Dynamic Programming</li>
+                        </ul>
+                        <a href="{{ url_for('algorithms') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-right me-2"></i>Explore DSA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="category-card">
+                <div class="card h-100 border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="category-icon me-3">
+                                <i class="fas fa-brain fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1">Machine Learning Algorithms</h4>
+                                <p class="text-muted mb-0">ML algorithms and statistical methods</p>
+                            </div>
+                        </div>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Linear & Logistic Regression</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Classification Algorithms</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Clustering Methods</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Neural Networks</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Ensemble Methods</li>
+                        </ul>
+                        <a href="{{ url_for('algorithms') }}" class="btn btn-success">
+                            <i class="fas fa-arrow-right me-2"></i>Explore ML
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="cta-card text-center p-5">
+                <h3 class="fw-bold text-white mb-3">Ready to Start Learning?</h3>
+                <p class="text-white-50 mb-4">Join our community and start mastering algorithms today!</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Get Started
+                    </a>
+                    <a href="{{ url_for('algorithms') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-list me-2"></i>Browse Algorithms
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

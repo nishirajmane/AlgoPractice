@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Code Editor - AlgoPractice{% endblock %}
+
+{% block extra_css %}
+<style>
+    #editor-container {
+        height: 500px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .editor-toolbar {
+        background: #f8f9fa;
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .output-panel {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        font-size: 14px;
+        min-height: 200px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 15px;
+    }
+
+    .output-panel.success {
+        border-left: 4px solid #28a745;
+    }
+
+    .output-panel.error {
+        border-left: 4px solid #dc3545;
+    }
+
+    .code-templates {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .template-item {
+        cursor: pointer;
+        padding: 10px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .template-item:hover {
+        background: #f8f9fa;
+        border-color: #007bff;
+    }
+
+    .template-item.active {
+        background: #e3f2fd;
+        border-color: #2196f3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-primary">
+                <i class="fas fa-code me-2"></i>Interactive Code Editor
+            </h1>
+            <p class="text-muted">Write, edit, and execute Python code in real-time</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Code Templates -->
+        <div class="col-md-3">
+            <div class="code-templates">
+                <h5><i class="fas fa-file-code me-2"></i>Code Templates</h5>
+                <div class="template-item" onclick="loadTemplate('bubble_sort')">
+                    <h6>Bubble Sort</h6>
+                    <small class="text-muted">Basic sorting algorithm</small>
+                </div>
+                <div class="template-item" onclick="loadTemplate('binary_search')">
+                    <h6>Binary Search</h6>
+                    <small class="text-muted">Efficient search algorithm</small>
+                </div>
+                <div class="template-item" onclick="loadTemplate('linked_list')">
+                    <h6>Linked List</h6>
+                    <small class="text-muted">Data structure implementation</small>
+                </div>
+                <div class="template-item" onclick="loadTemplate('fibonacci')">
+                    <h6>Fibonacci</h6>
+                    <small class="text-muted">Recursive and iterative</small>
+                </div>
+                <div class="template-item" onclick="loadTemplate('graph_dfs')">
+                    <h6>Graph DFS</h6>
+                    <small class="text-muted">Depth-first search</small>
+                </div>
+                <div class="template-item" onclick="loadTemplate('ml_linear_regression')">
+                    <h6>Linear Regression</h6>
+                    <small class="text-muted">Machine learning basics</small>
+                </div>
+            </div>
+
+            <!-- Algorithm Selection -->
+            <div class="code-templates">
+                <h5><i class="fas fa-list me-2"></i>Load Algorithm</h5>
+                <select class="form-select mb-2" id="algorithmSelect">
+                    <option value="">Choose an algorithm...</option>
+                    <optgroup label="Data Structures & Algorithms">
+                        {% for algorithm in algorithms.DSA %}
+                        <option value="DSA/{{ algorithm.filename }}">{{ algorithm.name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <optgroup label="Machine Learning">
+                        {% for algorithm in algorithms.MLA %}
+                        <option value="MLA/{{ algorithm.filename }}">{{ algorithm.name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="loadAlgorithm()">
+                    <i class="fas fa-download me-1"></i>Load
+                </button>
+            </div>
+        </div>
+
+        <!-- Code Editor -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <div class="editor-toolbar">
+                        <div>
+                            <span class="badge bg-primary">Python</span>
+                            <span class="ms-2 text-muted" id="lineInfo">Line 1, Column 1</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-success btn-sm me-2" onclick="runCode()">
+                                <i class="fas fa-play me-1"></i>Run
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm me-2" onclick="saveCode()">
+                                <i class="fas fa-save me-1"></i>Save
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="clearCode()">
+                                <i class="fas fa-trash me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="editor-container"></div>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="output-panel" id="outputPanel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Output</strong>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="clearOutput()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="outputContent">
+                    <span class="text-muted">Code output will appear here...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Monaco Editor -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+<script>
+    let editor;
+    let currentCode = '';
+
+    // Code templates
+    const codeTemplates = {
+        bubble_sort: `def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+# Test the algorithm
+arr = [64, 34, 25, 12, 22, 11, 90]
+print("Original array:", arr)
+sorted_arr = bubble_sort(arr.copy())
+print("Sorted array:", sorted_arr)`,
+
+        binary_search: `def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return -1
+
+# Test the algorithm
+arr = [1, 3, 5, 7, 9, 11, 13, 15]
+target = 7
+result = binary_search(arr, target)
+print(f"Array: {arr}")
+print(f"Searching for: {target}")
+print(f"Found at index: {result}")`,
+
+        linked_list: `class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+    
+    def append(self, data):
+        new_node = Node(data)
+        if not self.head:
+            self.head = new_node
+            return
+        
+        current = self.head
+        while current.next:
+            current = current.next
+        current.next = new_node
+    
+    def display(self):
+        current = self.head
+        while current:
+            print(current.data, end=" -> ")
+            current = current.next
+        print("None")
+
+# Test the linked list
+ll = LinkedList()
+ll.append(1)
+ll.append(2)
+ll.append(3)
+ll.append(4)
+print("Linked List:")
+ll.display()`,
+
+        fibonacci: `def fibonacci_recursive(n):
+    if n <= 1:
+        return n
+    return fibonacci_recursive(n-1) + fibonacci_recursive(n-2)
+
+def fibonacci_iterative(n):
+    if n <= 1:
+        return n
+    
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+# Test both implementations
+n = 10
+print(f"Fibonacci({n}) using recursive: {fibonacci_recursive(n)}")
+print(f"Fibonacci({n}) using iterative: {fibonacci_iterative(n)}")
+
+# Compare performance
+import time
+
+start = time.time()
+fibonacci_recursive(30)
+recursive_time = time.time() - start
+
+start = time.time()
+fibonacci_iterative(30)
+iterative_time = time.time() - start
+
+print(f"\\nPerformance comparison for n=30:")
+print(f"Recursive: {recursive_time:.4f} seconds")
+print(f"Iterative: {iterative_time:.4f} seconds")`,
+
+        graph_dfs: `from collections import defaultdict
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+    
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+    
+    def dfs_recursive(self, vertex, visited=None):
+        if visited is None:
+            visited = set()
+        
+        visited.add(vertex)
+        print(vertex, end=" ")
+        
+        for neighbor in self.graph[vertex]:
+            if neighbor not in visited:
+                self.dfs_recursive(neighbor, visited)
+    
+    def dfs_iterative(self, start):
+        visited = set()
+        stack = [start]
+        
+        while stack:
+            vertex = stack.pop()
+            if vertex not in visited:
+                print(vertex, end=" ")
+                visited.add(vertex)
+                stack.extend(reversed(self.graph[vertex]))
+
+# Test the graph
+g = Graph()
+g.add_edge(0, 1)
+g.add_edge(0, 2)
+g.add_edge(1, 2)
+g.add_edge(2, 0)
+g.add_edge(2, 3)
+g.add_edge(3, 3)
+
+print("Graph DFS (Recursive):")
+g.dfs_recursive(2)
+print("\\nGraph DFS (Iterative):")
+g.dfs_iterative(2)`,
+
+        ml_linear_regression: `import numpy as np
+import matplotlib.pyplot as plt
+
+class LinearRegression:
+    def __init__(self, learning_rate=0.01, epochs=1000):
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+        self.weights = None
+        self.bias = None
+    
+    def fit(self, X, y):
+        n_samples = X.shape[0]
+        self.weights = np.zeros(X.shape[1])
+        self.bias = 0
+        
+        for _ in range(self.epochs):
+            # Forward pass
+            y_pred = np.dot(X, self.weights) + self.bias
+            
+            # Compute gradients
+            dw = (1/n_samples) * np.dot(X.T, (y_pred - y))
+            db = (1/n_samples) * np.sum(y_pred - y)
+            
+            # Update parameters
+            self.weights -= self.learning_rate * dw
+            self.bias -= self.learning_rate * db
+    
+    def predict(self, X):
+        return np.dot(X, self.weights) + self.bias
+
+# Generate sample data
+np.random.seed(42)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
+
+# Train the model
+model = LinearRegression()
+model.fit(X, y)
+
+# Make predictions
+y_pred = model.predict(X)
+
+print("Linear Regression Results:")
+print(f"Weights: {model.weights[0]:.4f}")
+print(f"Bias: {model.bias:.4f}")
+print(f"First 5 predictions: {y_pred[:5].flatten()}")`
+    };
+
+    // Initialize Monaco Editor
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+        editor = monaco.editor.create(document.getElementById('editor-container'), {
+            value: '# Welcome to AlgoPractice Code Editor!\n# Start coding or select a template from the left panel.\n\nprint("Hello, World!")',
+            language: 'python',
+            theme: 'vs-dark',
+            fontSize: 14,
+            minimap: { enabled: true },
+            automaticLayout: true,
+            scrollBeyondLastLine: false,
+            wordWrap: 'on'
+        });
+
+        // Update line info
+        editor.onDidChangeCursorPosition(function (e) {
+            const position = e.position;
+            document.getElementById('lineInfo').textContent = `Line ${position.lineNumber}, Column ${position.column}`;
+        });
+
+        // Set initial code
+        currentCode = editor.getValue();
+    });
+
+    // Load template
+    function loadTemplate(templateName) {
+        if (codeTemplates[templateName]) {
+            editor.setValue(codeTemplates[templateName]);
+            currentCode = codeTemplates[templateName];
+
+            // Update active template
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.template-item').classList.add('active');
+        }
+    }
+
+    // Load algorithm from file
+    function loadAlgorithm() {
+        const selected = document.getElementById('algorithmSelect').value;
+        if (selected) {
+            fetch(`/api/algorithm/${selected}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content) {
+                        editor.setValue(data.content);
+                        currentCode = data.content;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading algorithm:', error);
+                    alert('Error loading algorithm');
+                });
+        }
+    }
+
+    // Run code
+    function runCode() {
+        const code = editor.getValue();
+        const outputPanel = document.getElementById('outputPanel');
+        const outputContent = document.getElementById('outputContent');
+
+        // Show loading
+        outputContent.innerHTML = '<span class="text-warning">Running code...</span>';
+        outputPanel.className = 'output-panel';
+
+        // Send code to backend for execution
+        fetch('/api/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ code: code })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    outputContent.innerHTML = `<pre>${data.output}</pre>`;
+                    outputPanel.className = 'output-panel success';
+                } else {
+                    outputContent.innerHTML = `<pre class="text-danger">${data.error}</pre>`;
+                    outputPanel.className = 'output-panel error';
+                }
+            })
+            .catch(error => {
+                outputContent.innerHTML = `<pre class="text-danger">Error: ${error.message}</pre>`;
+                outputPanel.className = 'output-panel error';
+            });
+    }
+
+    // Save code
+    function saveCode() {
+        const code = editor.getValue();
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'algorithm.py';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Clear code
+    function clearCode() {
+        if (confirm('Are you sure you want to clear the editor?')) {
+            editor.setValue('# Welcome to AlgoPractice Code Editor!\n# Start coding or select a template from the left panel.\n\nprint("Hello, World!")');
+            currentCode = editor.getValue();
+        }
+    }
+
+    // Clear output
+    function clearOutput() {
+        document.getElementById('outputContent').innerHTML = '<span class="text-muted">Code output will appear here...</span>';
+        document.getElementById('outputPanel').className = 'output-panel';
+    }
+</script>
+{% endblock %}
