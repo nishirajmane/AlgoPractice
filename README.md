@@ -1,50 +1,76 @@
-# Algorithms Educational Project
+# AlgoPractice
 
-This project contains Python files for all major Data Structures and Algorithms (DSA) and Machine Learning Algorithms (MLA), each explained in a way that a 10th-grade student can understand.
+A comprehensive web application for learning and practicing algorithms and data structures with interactive features.
 
-## How to Set Up and Run
+## Features
 
-### 1. Install All Dependencies
-Make sure you have Python 3.8+ installed. Then, install all required packages:
+- **User Authentication**: Register, login, and logout functionality
+- **Algorithm Upload**: Upload your own algorithms with Monaco code editor
+- **Algorithm Browsing**: View all local and user-uploaded algorithms
+- **Interactive Code Editor**: Write, test, and execute code in real-time
+- **Quiz System**: Test your knowledge with interactive quizzes
+- **Beautiful UI**: Modern, responsive design with Bootstrap
 
+## Tech Stack
+
+- **Backend**: Python Flask
+- **Frontend**: HTML, CSS, JavaScript, Bootstrap
+- **Database**: SQLite
+- **Code Editor**: Monaco Editor
+- **Styling**: Custom CSS with Bootstrap 5
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/nishirajmane/AlgoPractice.git
+cd AlgoPractice
+```
+
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Check Your Environment
-Run the following script to check if all required packages are installed and can be imported:
-
+3. Run the application:
 ```bash
-python import_all_packages.py
-```
-- This will print `[OK]` for each successful import and `[ERROR]` for any missing or problematic package.
-
-### 3. Run Individual Algorithm Files
-- All DSA files are in the `DSA/` folder (e.g., `DSA/01_arrays.py`, `DSA/17_avl_tree.py`, etc.).
-- All MLA files are in the `MLA/` folder (e.g., `MLA/01_linear_regression.py`, `MLA/21_recommendation_system.py`, etc.).
-
-To run any file, use:
-```bash
-python DSA/01_arrays.py
-python MLA/01_linear_regression.py
+python app.py
 ```
 
-### 4. Learning Path
-- Start with the lower-numbered files for basics, and move to higher numbers for advanced topics.
-- Each file contains:
-  - Problem statement
-  - Definitions
-  - Step-by-step explanation
-  - Simple code example
-  - Output and explanation
+4. Open your browser and visit: `http://127.0.0.1:5000`
 
-### 5. Additional Info
-- If you see any `[ERROR]` in `import_all_packages.py`, install the missing package using `pip install package_name`.
-- All code is written for clarity and learning, not for maximum performance.
-- You can edit or experiment with any file to deepen your understanding.
+## Usage
 
----
+1. **Register/Login**: Create an account or log in to access all features
+2. **Browse Algorithms**: Explore the collection of algorithms in DSA and ML categories
+3. **Upload Algorithms**: Share your own algorithms with the community
+4. **Code Editor**: Use the interactive editor to write and test code
+5. **Take Quizzes**: Test your knowledge with the quiz system
 
-**Happy Learning!**
+## Project Structure
 
-If you have questions or want to add more algorithms, just ask! 
+```
+AlgoPractice/
+├── app.py                 # Main Flask application
+├── requirements.txt       # Python dependencies
+├── algopractice.db       # SQLite database
+├── DSA/                  # Data Structures & Algorithms
+├── MLA/                  # Machine Learning Algorithms
+├── uploads/              # User uploaded algorithms
+├── static/               # Static files (CSS, JS)
+└── templates/            # HTML templates
+```
+
+## Developer
+
+**Designed and Developed by Nishiraj Mane**
+
+- **GitHub**: [https://github.com/nishirajmane](https://github.com/nishirajmane)
+- **LinkedIn**: [https://www.linkedin.com/in/nishiraj-mane/](https://www.linkedin.com/in/nishiraj-mane/)
+- **Portfolio**: [https://nishirajmaneai.netlify.app/](https://nishirajmaneai.netlify.app/)
+- **Email**: manenishiraj@gmail.com
+- **Location**: Pune, Maharashtra, India
+
+## License
+
+© 2025 AlgoPractice. All rights reserved. 
